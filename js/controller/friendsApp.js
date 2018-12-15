@@ -4,9 +4,9 @@
 'use strict';
 app.controller('FriendsAppCtrl', function ($scope) {
 
-    VK.api('friends.getAppUsers', {v: '5.40', https: 1}, function (friends) {
+    VK.api('friends.getAppUsers', {v: '5.92', https: 1}, function (friends) {
         if (friends.response) {
-            VK.api('users.get', {user_ids: friends.response.join(), fields: 'photo_50', v: '5.40', https: 1}, function (users) {
+            VK.api('users.get', {user_ids: friends.response.join(), fields: 'photo_50', v: '5.92', https: 1}, function (users) {
                 if (users.response) {
                     $scope.friendsApp = users.response;
                     $scope.$digest();
