@@ -5,7 +5,7 @@ var i = 0;
 while (i < groups_ids.length) {
     var items = API.groups.getMembers({
         "group_id": groups_ids[i],
-        "v": "5.27",
+        "v": "5.92",
         "count": "1000",
         filter: "friends"
     }).items;
