@@ -1,0 +1,1 @@
+var app = angular.module('application', ['ngToast', 'cfp.loadingBar']);

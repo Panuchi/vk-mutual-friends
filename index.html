@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html ng-app="application">
+<head lang="ru">
+    <meta charset="UTF-8">
+    <title>Всевидящее око</title>
+
+    <!-- Seo -->
+    <meta name="description"
+          content="Всевидящее око">
+    <meta name="keywords"
+          content="Всевидящее око, узнать все о друзьях">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png"/>
+
+    <!-- CSS БИБЛИОТЕКИ -->
+    <link href="library/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="library/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="library/ngToast-master/dist/ngToast.min.css" rel="stylesheet">
+    <link href="library/angular-loading-bar-master/build/loading-bar.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+
+    <!-- OPEN API VK -->
+    <!--<script src="https://vk.com/js/api/openapi.js" type="text/javascript"></script>-->
+    <script src="//vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
+    <script src="js/arraymath.js"></script>
+</head>
+<body>
+<toast></toast>
+<header>
+    <div class="container" style="margin-top: 20px;">
+
+        <div align="left" class="friends_app scroll_bar" ng-controller="FriendsAppCtrl" ng-show="friendsApp.length > 0">
+            <div class="titlet">Друзья в приложении</div>
+            <ul>
+                <a ng-repeat="friend in friendsApp" href="https://vk.com/id{{ friend.id }}" target="_blank">
+                    <li>
+                        <img src="{{ friend.photo_50 }}">
+
+                        <div class="text">{{ friend.first_name }}</div>
+                    </li>
+                </a>
+            </ul>
+        </div>
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#mutual-participants-and-friends" data-toggle="tab"
+                                  id="show-mutual-participants-and-friends">Поиск друзей в группах</a></li>
+            <li><a href="#about" data-toggle="tab" id="show-about">Контакты</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+            <!-- Общие друзья -->
+            <div class="tab-pane active" id="mutual-participants-and-friends">
+                <div class="row" ng-controller="SearchFriendsByWordFromGroupsCtrl" style="margin-top: 20px;">
+                    <!--<div class="alert alert-info">Обновление! Исправлены ошибки зацикливания.</div>-->
+                    <div class="col-md-6">
+                        <div class="row">
+                            <span class="text_label">Введите поисковый запрос (Например: "порно"):</span>
+
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                       ng-model="word"
+                                       ng-disabled="disabled"
+                                       placeholder="Слово, которое указано в названии группы...">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-success"
+                                            type="button"
+                                            ng-disabled="disabled"
+                                            ng-click="search()">Начать поиск
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="buttons" ng-controller="InviteCtrl">
+                                <button class="btn btn-primary" type="button"
+                                        ng-click="invite()"><i class="fa fa-child"></i> Пригласить друзей
+                                </button>
+                                <button class="btn btn-info" type="button"
+                                        ng-click="wall()"><i class="fa fa-commenting-o"></i> Рассказать друзьям
+                                </button>
+                            </div>
+                        </div>
+                        <!--<div class="row" style="padding-top: 50px;" align="center">-->
+                        <!--<canvas class="chart chart-bar" data="dataFriendsCounts" labels="labelsFriendsNames"-->
+                        <!--series="seriesFriends"></canvas>-->
+                        <!--</div>-->
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <span class="text_label">Поиск:</span>
+                                    <input type="text" class="form-control"
+                                           ng-model="search_result"
+                                           placeholder="Название...">
+                                </div>
+                                <div class="col-md-3">
+                                    <span class="text_label">Выводимых:</span>
+                                    <input type="number" class="form-control"
+                                           ng-model="limit"
+                                           placeholder="Ссылку на профиль пользователя или группы...">
+                                </div>
+                                <div class="col-md-5">
+                                    <span class="text_label">Сортировать:</span>
+                                    <select class="form-control ng-pristine ng-valid ng-touched"
+                                            ng-model="sort">
+                                        <option value="-items.length">По убыванию</option>
+                                        <option value="+items.length">По возрастанию</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="add_info">
+                                <div class="left">Результат</div>
+                                <div class="right">{{ result_array.length ? result_array.length : 0 }}</div>
+                            </div>
+                            <div class="scroll_bar" style="max-height: 280px;">
+                                <div class="alert alert-success alert-dismissible"
+                                     ng-repeat="object in result_array | orderBy: sort | filter: search_result | limitTo: limit">
+                                    <a href="https://vk.com/{{ object.group.screen_name }}" target="_blank">
+                                        <div class="close">
+                                            <i class="fa fa-vk"></i>
+                                        </div>
+                                    </a>
+
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <div class="img">
+                                                <a href="https://vk.com/{{ object.group.screen_name }}" target="_blank">
+                                                    <img class="media-object" ng-src="{{ object.group.photo_50 }}"
+                                                         width="50px"
+                                                         height="50px">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="media-body">
+                                            <strong>{{ object.group.name }}</strong>
+
+                                            <div class="friends_title">В данной группе <b>{{ object.items.length }}</b>
+                                                ваших друзей
+                                            </div>
+                                            <div class="scroll_bar" style="height: 31px;">
+                                                <ul class="friends">
+                                                    <a ng-repeat="item in object.items"
+                                                       href="https://vk.com/id{{ item.id }}" target="_blank">
+                                                        <li>
+                                                            <img src="{{ item.photo_50 }}"
+                                                                 alt="{{ item.first_name }} {{ item.last_name }}"
+                                                                 title="{{ item.first_name }} {{ item.last_name }}"/>
+                                                        </li>
+                                                    </a>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="arrUrlsLength0" ng-show="result_array.length <= 0">
+                                Ничего не найдено!
+                            </div>
+
+                            <div class="start" ng-show="start_load >= 0">
+                                Обработка ссылки "<b>{{ index_name }}</b>"
+                                <div class="progress progress-striped active">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="{{ start_load }}"
+                                         aria-valuemin="0" aria-valuemax="100" style="width: {{ start_load }}%">
+                                        <span class="sr-only">{{ start_load }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- О приложении -->
+            <div class="tab-pane" id="about">
+                <div class="row" style="margin-top: 30px;" align="center">
+
+
+                    <div class="friends_app_c">
+                        <ul>
+                            <a href="https://vk.com/daaaaaaaaa" target="_blank">
+                                <li>
+                                    <img src="https://pp.vk.me/c627929/v627929634/131a7/jQHuXS7FP_k.jpg">
+
+                                    <div class="text">Роман Мещеряков</div>
+                                </li>
+                            </a>
+                        </ul>
+                    </div>
+
+                    <div align="left" style="display: inline-block;">
+                        <p>Если у вас появлись вопросы или предложения,<br/> пишите по следующим контактам</p>
+                        <ol>
+                            <li>Вконтакте: <a href="https://vk.com/daaaaaaaaa"
+                                              target="_blank">https://vk.com/daaaaaaaaa</a>
+                            </li>
+                            <li>Скайп: xmawer</li>
+                        </ol>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</header>
+
+<!-- JS БИБЛИОТЕКИ -->
+<script src="library/jquery-2.1.4/jquery-2.1.4.min.js"></script>
+<script src="library/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+
+<!-- ANGULARJS -->
+<script src="library/angularjs-1.4.2/angular.min.js"></script>
+<script src="library/angularjs-1.4.2/angular-sanitize.min.js"></script>
+<script src="library/angularjs-1.4.2/angular-animate.min.js"></script>
+<script src="library/ngToast-master/dist/ngToast.min.js"></script>
+<script src="library/angular-loading-bar-master/build/loading-bar.min.js"></script>
+<script src="js/scripts.js"></script>
+<script src="js/controller/searchFriendsByWordFromGroups.js"></script>
+<script src="js/controller/friendsApp.js"></script>
+<script src="js/controller/invite.js"></script>
+</body>
+</html>
